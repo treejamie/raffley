@@ -1,5 +1,4 @@
 defmodule Raffley.Rules do
-
   def list_rules do
     [
       %{
@@ -16,5 +15,12 @@ defmodule Raffley.Rules do
         text: "Have fun! 🎟️"
       }
     ]
+  end
+
+  def get_rule(id) when is_integer(id) do
+    Enum.find(list_rules(), fn r -> r.id == id end)
+  end
+  def get_rule(id) when is_binary(id) do
+    id |> String.to_integer() |> get_rule()
   end
 end
