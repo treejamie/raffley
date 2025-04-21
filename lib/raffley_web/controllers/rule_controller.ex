@@ -3,6 +3,13 @@ defmodule RaffleyWeb.RuleController do
 
   alias Raffley.Rules
 
+
+  def show(conn, %{"id" => id}) do
+    rule = Rules.get_rule(id)
+
+    render(conn, :show, rule: rule)
+  end
+
   def index(conn, _params) do
     emojis = ~w(🐞 🤢  🔥) |> Enum.random() |> String.duplicate(5)
 
