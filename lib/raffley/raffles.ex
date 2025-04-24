@@ -13,6 +13,17 @@ defmodule Raffley.Raffles do
     id |> String.to_integer() |> get_raffle()
   end
 
+  @spec list_raffles() :: [
+          %Raffley.Raffle{
+            description: <<_::64, _::_*8>>,
+            id: 1 | 2 | 3,
+            image_path: <<_::64, _::_*8>>,
+            prize: <<_::144>>,
+            status: :closed | :open | :upcoming,
+            ticket_price: 1 | 2 | 3
+          },
+          ...
+        ]
   def list_raffles do
     [
       %Raffley.Raffle{
