@@ -1,4 +1,5 @@
 defmodule RaffleyWeb.Router do
+
   use RaffleyWeb, :router
 
   pipeline :browser do
@@ -26,11 +27,15 @@ defmodule RaffleyWeb.Router do
   scope "/", RaffleyWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    #get "/", PageController, :home
     get "/rules", RuleController, :index
     get "/rules/:id", RuleController, :show
+
+
+    live "/", RaffleLive.Index
     live "/estimator", EstimatorLive
     live "/raffles", RaffleLive.Index
+    live "/raffles/:id", RaffleyLive.Show
   end
 
   # Other scopes may use custom stacks.

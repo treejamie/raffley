@@ -4,6 +4,26 @@ end
 
 
 defmodule Raffley.Raffles do
+
+  def get_raffle(id) when is_integer(id) do
+    Enum.find(list_raffles(), fn r-> r.id == id end)
+  end
+
+  def get_raffle(id) when is_binary(id) do
+    id |> String.to_integer() |> get_raffle()
+  end
+
+  @spec list_raffles() :: [
+          %Raffley.Raffle{
+            description: <<_::64, _::_*8>>,
+            id: 1 | 2 | 3,
+            image_path: <<_::64, _::_*8>>,
+            prize: <<_::144>>,
+            status: :closed | :open | :upcoming,
+            ticket_price: 1 | 2 | 3
+          },
+          ...
+        ]
   def list_raffles do
     [
       %Raffley.Raffle{
@@ -32,4 +52,9 @@ defmodule Raffley.Raffles do
       }
     ]
   end
+
+  def featured_raffles(raffle) do
+    list_raffles() |> List.delete(raffle)
+  end
+
 end
