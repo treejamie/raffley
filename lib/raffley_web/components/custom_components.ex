@@ -1,5 +1,5 @@
 defmodule RaffleyWeb.CustomComponents do
-  use RaffleyWeb, :html
+  use Phoenix.Component
 
 
   attr :status, :atom, values: [:upcoming, :open, :closed], default: :upcoming
