@@ -1,9 +1,7 @@
-defmodule Raffley.Raffle do
-  defstruct [:id,  :prize, :ticket_price, :status, :image_path, :description]
-end
-
-
 defmodule Raffley.Raffles do
+
+  alias Raffley.Raffles.Raffle
+
 
   def get_raffle(id) when is_integer(id) do
     Enum.find(list_raffles(), fn r-> r.id == id end)
@@ -14,7 +12,7 @@ defmodule Raffley.Raffles do
   end
 
   @spec list_raffles() :: [
-          %Raffley.Raffle{
+          %Raffle{
             description: <<_::64, _::_*8>>,
             id: 1 | 2 | 3,
             image_path: <<_::64, _::_*8>>,
@@ -26,7 +24,7 @@ defmodule Raffley.Raffles do
         ]
   def list_raffles do
     [
-      %Raffley.Raffle{
+      %Raffle{
         id: 1,
         prize: "Autographed Jersey",
         ticket_price: 2,
@@ -34,7 +32,7 @@ defmodule Raffley.Raffles do
         image_path: "/images/jersey.jpg",
         description: "Step up, sports fans!"
       },
-      %Raffley.Raffle{
+      %Raffle{
         id: 2,
         prize: "Coffee With A Yeti",
         ticket_price: 3,
@@ -42,7 +40,7 @@ defmodule Raffley.Raffles do
         image_path: "/images/yeti-coffee.jpg",
         description: "A super-chill coffee date."
       },
-      %Raffley.Raffle{
+      %Raffle{
         id: 3,
         prize: "Vintage Comic Book",
         ticket_price: 1,
