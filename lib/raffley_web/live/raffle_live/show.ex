@@ -3,7 +3,6 @@ defmodule RaffleyWeb.RaffleyLive.Show do
   alias Raffley.Raffles
 
   def mount(_params, _session, socket) do
-
     {:ok, socket}
   end
 
@@ -13,7 +12,7 @@ defmodule RaffleyWeb.RaffleyLive.Show do
 
     # this code was in mount, but it was moved into
     # here to demonstrate how this works.
-    raffle = Raffles.get_raffle(id)
+    raffle = Raffles.get_raffle!(id)
 
     socket =
       socket
