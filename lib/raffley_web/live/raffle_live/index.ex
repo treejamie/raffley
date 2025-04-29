@@ -4,13 +4,16 @@ defmodule RaffleyWeb.RaffleLive.Index do
   import RaffleyWeb.CustomComponents
 
   def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
 
+  def handle_params(params, _uri, socket) do
     socket =
       socket
-      |> stream(:raffles, Raffles.list_raffles())
-      |> assign(:form, to_form(%{}))
+      |> stream(:raffles, Raffles.filter_raffles(params))
+      |> assign(:form, to_form(params))
 
-    {:ok, socket}
+    {:noreply, socket}
   end
 
 
@@ -33,6 +36,11 @@ defmodule RaffleyWeb.RaffleLive.Index do
       <.filter_form form={@form} />
 
       <div class="raffles" id="raffles" phx-update="stream">
+        <div id="empty" class="no-results only:block hidden">
+          No raffles found. Try changing your filters.
+        </div>
+
+
         <.raffle_card :for={{dom_id, raffle} <- @streams.raffles} raffle={raffle} id={dom_id}/>
       </div>
     </div>
@@ -65,15 +73,23 @@ defmodule RaffleyWeb.RaffleLive.Index do
             ]}
           />
 
+          <.link navigate={~p"/raffles"}>
+          Reset
+
+          </.link>
+
       </.form>
     """
   end
 
   def handle_event("filter", params, socket) do
-    socket =
-      socket
-      |> assign(:form, to_form(params))
-      |> stream(:raffles, Raffles.filter_raffles(params), reset: :trues)
+    params =
+      params
+      |> Map.take(~w(q status sort_by))
+      |> Map.reject(fn {_, v} -> v == "" end)
+
+    socket = push_navigate(socket, to: ~p"/raffles?#{params}")
+
     {:noreply, socket}
   end
 
