@@ -6,8 +6,6 @@ defmodule RaffleyWeb.RaffleyLive.Show do
     {:ok, socket}
   end
 
-
-  # this is calle immediately after mound
   def handle_params(%{"id" => id}, _uri, socket) do
 
     # this code was in mount, but it was moved into
@@ -18,7 +16,9 @@ defmodule RaffleyWeb.RaffleyLive.Show do
       socket
       |> assign(:raffle, raffle)
       |> assign(:page_title, raffle.prize)
-      |> assign(:featured_raffles, Raffles.featured_raffles(raffle))
+      |> assign_async(:featured_raffles, fn  ->
+         {:ok, %{featured_raffles: Raffles.featured_raffles(raffle)}}
+      end)
 
     {:noreply, socket}
   end
@@ -56,14 +56,33 @@ defmodule RaffleyWeb.RaffleyLive.Show do
     ~H"""
     <section>
       <h4>Featured Raffles</h4>
-      <ul class="raffles">
-        <li :for={raffle <- @raffles}>
-         <.link navigate={~p"/raffles/#{raffle}"}>
-          <img src={raffle.image_path} alt="{raffle.description}">
-          {raffle.prize}
-          </.link>
-        </li>
-      </ul>
+
+      <.async_result :let={result} assign={@raffles}>
+
+        <:loading>
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        </:loading>
+
+        <:failed :let={{:error, reason}}>
+          <div class="failed">
+            {reason}
+          </div>
+        </:failed>
+
+        <ul class="raffles" >
+          <li :for={raffle <- result}>
+          <.link navigate={~p"/raffles/#{raffle}"}>
+            <img src={raffle.image_path} alt="{raffle.description}">
+            {raffle.prize}
+            </.link>
+          </li>
+        </ul>
+
+      </.async_result>
+
+
     </section>
     """
   end
