@@ -21,7 +21,8 @@ defmodule Raffley.Raffles do
   end
 
   defp sort_by(query, "prize"), do: order_by(query, :prize )
-  defp sort_by(query, "ticket_price"), do: order_by(query, desc: :ticket_price )
+  defp sort_by(query, "ticket_price_desc"), do: order_by(query, desc: :ticket_price )
+  defp sort_by(query, "ticket_price_asc"), do: order_by(query, asc: :ticket_price )
   defp sort_by(query, _), do: order_by(query, :id)
 
   defp search_by(query, q) when q in ["", nil], do: query
