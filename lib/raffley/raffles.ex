@@ -36,6 +36,7 @@ defmodule Raffley.Raffles do
   defp with_status(query, _status), do: query
 
   def featured_raffles(raffle) do
+    Process.sleep(2000)
     Raffle
     |> where(status: :open)
     |> where([r], r.id != ^raffle.id)
