@@ -11,12 +11,12 @@ defmodule Raffley.Raffles do
     Repo.all(Raffle)
   end
 
+  @spec filter_raffles(nil | maybe_improper_list() | map()) :: any()
   def filter_raffles(filter) do
     Raffle
     |> with_status(filter["status"])
     |> search_by(filter["q"])
     |> sort_by(filter["sort_by"])
-    |> IO.inspect()
     |> Repo.all()
   end
 
