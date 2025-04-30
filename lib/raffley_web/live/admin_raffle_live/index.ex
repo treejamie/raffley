@@ -8,6 +8,7 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
       socket
       |> assign(:page_title, "Listing Raffles")
       |> stream(:raffles, Admin.list_raffles())
+
     {:ok, socket}
   end
 
@@ -39,5 +40,4 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
     </div>
     """
   end
-
 end
