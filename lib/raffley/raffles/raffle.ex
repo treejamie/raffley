@@ -3,11 +3,11 @@ defmodule Raffley.Raffles.Raffle do
   import Ecto.Changeset
 
   schema "raffles" do
-    field :status, Ecto.Enum, values: [:upcoming, :open, :closed], default: :upcoming
-    field :description, :string
-    field :prize, :string
-    field :ticket_price, :integer, default: 1
-    field :image_path, :string
+    field(:status, Ecto.Enum, values: [:upcoming, :open, :closed], default: :upcoming)
+    field(:description, :string)
+    field(:prize, :string)
+    field(:ticket_price, :integer, default: 1)
+    field(:image_path, :string)
 
     timestamps(type: :utc_datetime)
   end
@@ -17,5 +17,7 @@ defmodule Raffley.Raffles.Raffle do
     raffle
     |> cast(attrs, [:prize, :description, :ticket_price, :status, :image_path])
     |> validate_required([:prize, :description, :ticket_price, :status, :image_path])
+    |> validate_length(:description, min: 10)
+    |> validate_number(:ticket_price, greater_or_equal_to: 1)
   end
 end

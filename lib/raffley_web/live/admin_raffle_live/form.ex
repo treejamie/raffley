@@ -2,7 +2,6 @@ defmodule RaffleyWeb.AdminRaffleLive.Form do
   use RaffleyWeb, :live_view
   alias Raffley.Admin
 
-
   def mount(_params, _session, socket) do
     socket =
       socket

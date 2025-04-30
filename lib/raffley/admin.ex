@@ -1,5 +1,4 @@
 defmodule Raffley.Admin do
-
   alias Raffley.Raffles.Raffle
   alias Raffley.Repo
   import Ecto.Query
@@ -10,7 +9,7 @@ defmodule Raffley.Admin do
     |> Repo.all()
   end
 
-  def create_raffle(attrs \\ %{} ) do
+  def create_raffle(attrs \\ %{}) do
     #
     #
     #
@@ -22,10 +21,9 @@ defmodule Raffley.Admin do
       prize: attrs["prize"],
       description: attrs["description"],
       ticket_price: attrs["ticket_price"] |> String.to_integer(),
-      status: attrs["status"] |> String.to_existing_atom,
+      status: attrs["status"] |> String.to_existing_atom(),
       image_path: "images/jersey.jpg"
     }
     |> Repo.insert!()
-
   end
 end
