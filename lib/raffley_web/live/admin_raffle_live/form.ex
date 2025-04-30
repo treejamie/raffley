@@ -1,5 +1,6 @@
 defmodule RaffleyWeb.AdminRaffleLive.Form do
   use RaffleyWeb, :live_view
+  alias Raffley.Admin
 
 
   def mount(_params, _session, socket) do
@@ -11,12 +12,27 @@ defmodule RaffleyWeb.AdminRaffleLive.Form do
     {:ok, socket}
   end
 
+  def handle_event("save", %{"raffle" => raffle_params}, socket) do
+    #
+    #
+    #
+    #  WARNING - THIS LESSON WAS TO PROVE THE POINT ABOUT ECTO CHANGESETS
+    #            BEING A THING TO USE. THIS CODE DOES NOT USE CHANGESETS.
+    #
+    #
+    Admin.create_raffle(raffle_params)
+
+    socket = push_navigate(socket, to: ~p"/admin/raffles")
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     ~H"""
     <.header>
       {@page_title}
     </.header>
-    <.simple_form for={@form} id="raffle-form">
+    <.simple_form for={@form} id="raffle-form" phx-submit="save">
 
         <.input field={@form[:prize]} label="Prize"/>
 
@@ -35,7 +51,7 @@ defmodule RaffleyWeb.AdminRaffleLive.Form do
         <.input field={@form[:image_path]} label="Image Path"/>
 
         <:actions>
-          <.button> Save Raffle </.button>
+          <.button phx-disable-with="Saving..."> Save Raffle </.button>
         </:actions>
 
       <.back navigate={~p"/admin/raffles"}>
