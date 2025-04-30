@@ -7,7 +7,7 @@ defmodule Raffley.Raffles.Raffle do
     field(:description, :string)
     field(:prize, :string)
     field(:ticket_price, :integer, default: 1)
-    field(:image_path, :string)
+    field(:image_path, :string, default: "/images/placeholder.jpg")
 
     timestamps(type: :utc_datetime)
   end
@@ -18,6 +18,6 @@ defmodule Raffley.Raffles.Raffle do
     |> cast(attrs, [:prize, :description, :ticket_price, :status, :image_path])
     |> validate_required([:prize, :description, :ticket_price, :status, :image_path])
     |> validate_length(:description, min: 10)
-    |> validate_number(:ticket_price, greater_or_equal_to: 1)
+    |> validate_number(:ticket_price, greater_than_or_equal_to: 1)
   end
 end

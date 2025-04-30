@@ -1,29 +1,35 @@
 defmodule RaffleyWeb.AdminRaffleLive.Form do
   use RaffleyWeb, :live_view
   alias Raffley.Admin
+  alias Raffley.Raffles.Raffle
 
   def mount(_params, _session, socket) do
+
+    changeset = Raffle.changeset(%Raffle{}, %{})
+
     socket =
       socket
       |> assign(:page_title, "New Raffle")
-      |> assign(:form, to_form(%{}, as: "raffle"))
+      |> assign(:form, to_form(changeset))
 
     {:ok, socket}
   end
 
+
   def handle_event("save", %{"raffle" => raffle_params}, socket) do
-    #
-    #
-    #
-    #  WARNING - THIS LESSON WAS TO PROVE THE POINT ABOUT ECTO CHANGESETS
-    #            BEING A THING TO USE. THIS CODE DOES NOT USE CHANGESETS.
-    #
-    #
-    Admin.create_raffle(raffle_params)
+    case Admin.create_raffle(raffle_params) do
+      {:ok, _raffle} ->
+        socket =
+          socket
+          |> put_flash(:info, "Raffle created sucessfully!")
+          |> push_navigate(to: ~p"/admin/raffles")
 
-    socket = push_navigate(socket, to: ~p"/admin/raffles")
+        {:noreply, socket}
 
-    {:noreply, socket}
+      {:error, %Ecto.Changeset{} = changeset} ->
+        socket = assign(socket, :form, to_form(changeset))
+        {:noreply, socket}
+    end
   end
 
   def render(assigns) do
