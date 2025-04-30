@@ -16,6 +16,11 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
     <div class="admin-index">
       <.header>
         {@page_title}
+        <:actions>
+          <.link navigate={~p"/admin/raffles/new"} class="button">
+            New Raffle
+          </.link>
+        </:actions>
       </.header>
 
       <.table id="raffles" rows={@streams.raffles}>
