@@ -36,6 +36,13 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
         <:col :let={{_dom_id, raffle}} label="Ticket Proce">
             {raffle.ticket_price}
         </:col>
+
+        <:action :let={{_dom_id, raffle}}>
+          <.link navigate={~p"/admin/raffles/#{raffle.id}/edit"}>
+           Edit
+          </.link>
+        </:action>
+
       </.table>
     </div>
     """
