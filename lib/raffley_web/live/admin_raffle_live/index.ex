@@ -22,10 +22,10 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
         time: 300
         )
       }>
-      Toggle Joke
-    </.button>
+        Toggle Joke
+      </.button>
       <div id="joke" class="joke hidden">
-      What's a trees favourite drink?
+        What's a trees favourite drink?
       </div>
       <.header class="mt-6">
         {@page_title}
