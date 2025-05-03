@@ -15,7 +15,19 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
   def render(assigns) do
     ~H"""
     <div class="admin-index">
-      <.header>
+      <.button phx-click={JS.toggle(
+        to: "#joke",
+        in: {"ease-in-out duration-300", "opacity-0", "opacity-100"},
+        out: {"ease-in-out duration-300", "opacity-100", "opacity-0"},
+        time: 300
+        )
+      }>
+      Toggle Joke
+    </.button>
+      <div id="joke" class="joke hidden">
+      What's a trees favourite drink?
+      </div>
+      <.header class="mt-6">
         {@page_title}
         <:actions>
           <.link navigate={~p"/admin/raffles/new"} class="button">
@@ -24,7 +36,11 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
         </:actions>
       </.header>
 
-      <.table id="raffles" rows={@streams.raffles}>
+      <.table
+        row_click={fn {_, raffle} -> JS.navigate(~p"/raffles/#{raffle.id}") end}
+        id="raffles"
+        rows={@streams.raffles}
+        >
         <:col :let={{_dom_id, raffle}} label="Prize">
           <.link navigate={~p"/raffles/#{raffle.id}"}>
             {raffle.prize}
@@ -48,17 +64,32 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
           </.link>
         </:action>
 
+        <:action :let={{dom_id, raffle}}>
+          <.link phx-click={delete_and_hide(dom_id, raffle) }
+          data-confirm="Are you sure?">
+           Delete
+          </.link>
+        </:action>
+
       </.table>
     </div>
     """
   end
 
 
-  def handle_event("delete", %{"id" => id }, socket) do
+  def handle_event("delete", %{"id" => id}, socket) do
     raffle = Admin.get_raffle!(id)
     {:ok, _raffle} = Admin.delete_raffle(raffle)
 
     socket = stream_delete(socket, :raffles, raffle)
     {:noreply, socket}
   end
+
+
+
+  def delete_and_hide(dom_id, raffle) do
+    JS.push("delete", value: %{id: raffle.id})
+    |> JS.hide(to: "##{dom_id}", transition: "fade-out")
+  end
+
 end
