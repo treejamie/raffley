@@ -9,6 +9,11 @@ defmodule Raffley.Raffles.Raffle do
     field(:ticket_price, :integer, default: 1)
     field(:image_path, :string, default: "/images/placeholder.jpg")
 
+    belongs_to(:charity, Raffley.Charities.Charity)
+
+    # remember ecto creates, two "under the hood fields".
+    # sometimes you'll need to open the hood in your own work
+
     timestamps(type: :utc_datetime)
   end
 
