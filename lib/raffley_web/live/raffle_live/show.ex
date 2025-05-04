@@ -31,7 +31,11 @@ defmodule RaffleyWeb.RaffleyLive.Show do
         <section>
           <.badge status={@raffle.status} />
           <header>
+            <div>
             <h2>{@raffle.prize}</h2>
+            <h3>{@raffle.charity.name}</h3>
+
+            </div>
             <div class="price">
               ${@raffle.ticket_price} / ticket
             </div>
@@ -71,7 +75,7 @@ defmodule RaffleyWeb.RaffleyLive.Show do
           </div>
         </:failed>
 
-        <ul class="raffles" >
+        <ul class="raffles">
           <li :for={raffle <- result}>
           <.link navigate={~p"/raffles/#{raffle}"}>
             <img src={raffle.image_path} alt="{raffle.description}">

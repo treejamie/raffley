@@ -1,10 +1,11 @@
 defmodule Raffley.Charities.Charity do
   use Ecto.Schema
+
   import Ecto.Changeset
 
   schema "charities" do
-    field :name, :string
-    field :slug, :string
+    field(:name, :string)
+    field(:slug, :string)
 
     has_many(:raffles, Raffley.Raffles.Raffle)
 
@@ -21,4 +22,6 @@ defmodule Raffley.Charities.Charity do
     |> unique_constraint(:slug)
     |> unique_constraint(:name)
   end
+
+
 end
