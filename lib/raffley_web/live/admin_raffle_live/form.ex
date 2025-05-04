@@ -1,10 +1,17 @@
 defmodule RaffleyWeb.AdminRaffleLive.Form do
   use RaffleyWeb, :live_view
   alias Raffley.Admin
+  alias Raffley.Charities
   alias Raffley.Raffles.Raffle
 
+
   def mount(params, _session, socket) do
-    {:ok, apply_action(socket, socket.assigns.live_action, params)}
+    socket =
+      socket
+      |> assign(:charity_options, Charities.charity_names_and_ids)
+      |> apply_action(socket.assigns.live_action, params)
+
+    {:ok, socket}
   end
 
   defp apply_action(socket, :new, _params) do
@@ -92,6 +99,14 @@ defmodule RaffleyWeb.AdminRaffleLive.Form do
           label="Status"
           prompt="Choose a status"
           options={[:upcoming, :open, :closed]}
+        />
+
+        <.input
+          field={@form[:charity_id]}
+          type="select"
+          label="Charity"
+          prompt="Choose a charity"
+          options={@charity_options}
         />
 
         <.input field={@form[:image_path]} label="Image Path"/>

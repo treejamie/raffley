@@ -13,6 +13,18 @@
   <:item title="Slug">{@charity.slug}</:item>
 </.list>
 
+<section class="mt-12">
+  <h4>Raffles</h4>
+        <ul class="raffles">
+          <li :for={raffle <- @charity.raffles}>
+          <.link navigate={~p"/raffles/#{raffle}"}>
+            <img src={raffle.image_path} alt="{raffle.description}">
+            {raffle.prize}
+            </.link>
+          </li>
+        </ul>
+</section>
+
 <.back navigate={~p"/charities"}>Back to charities</.back>
 
 <.modal :if={@live_action == :edit} id="charity-modal" show on_cancel={JS.patch(~p"/charities/#{@charity}")}>

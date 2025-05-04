@@ -5,6 +5,7 @@ defmodule Raffley.Raffles do
 
   def get_raffle!(id) do
     Repo.get!(Raffle, id)
+    |> Repo.preload(:charity)
   end
 
   def list_raffles do
@@ -17,6 +18,7 @@ defmodule Raffley.Raffles do
     |> with_status(filter["status"])
     |> search_by(filter["q"])
     |> sort_by(filter["sort_by"])
+    |> preload(:charity)
     |> Repo.all()
   end
 
@@ -36,7 +38,7 @@ defmodule Raffley.Raffles do
   defp with_status(query, _status), do: query
 
   def featured_raffles(raffle) do
-    Process.sleep(2000)
+    Process.sleep(500)
     Raffle
     |> where(status: :open)
     |> where([r], r.id != ^raffle.id)

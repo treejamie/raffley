@@ -13,7 +13,7 @@ defmodule RaffleyWeb.CharityLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:charity, Charities.get_charity!(id))}
+     |> assign(:charity, Charities.get_charity_with_raffles!(id))}
   end
 
   defp page_title(:show), do: "Show Charity"
