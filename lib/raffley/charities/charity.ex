@@ -6,6 +6,10 @@ defmodule Raffley.Charities.Charity do
     field :name, :string
     field :slug, :string
 
+    has_many(:raffles, Raffley.Raffles.Raffle)
+
+    # field: raffles < more under the hood
+
     timestamps(type: :utc_datetime)
   end
 

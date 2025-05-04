@@ -58,11 +58,7 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
            Edit
           </.link>
         </:action>
-        <:action :let={{_dom_id, raffle}}>
-          <.link phx-click="delete" phx-value-id={raffle.id} data-confirm="Are you sure?">
-           Delete
-          </.link>
-        </:action>
+
 
         <:action :let={{dom_id, raffle}}>
           <.link phx-click={delete_and_hide(dom_id, raffle) }
