@@ -55,7 +55,6 @@ defmodule Raffley.Charities do
       from(c in Charity,
         order_by: :name,
         select: {c.name, c.id})
-
     Repo.all(query)
   end
 
