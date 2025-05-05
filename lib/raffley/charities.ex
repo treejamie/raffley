@@ -47,7 +47,7 @@ defmodule Raffley.Charities do
         order_by: :name,
         select: {c.name, c.id})
 
-        Repo.all(query)
+    Repo.all(query)
   end
 
   @doc """
