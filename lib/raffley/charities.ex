@@ -41,7 +41,16 @@ defmodule Raffley.Charities do
     |> Repo.preload(:raffles)
   end
 
-  def charity_names_and_ids do
+  def charity_names_and_slugs() do
+    query =
+      from(c in Charity,
+        order_by: :name,
+        select: {c.name, c.slug})
+
+        Repo.all(query)
+    end
+
+  def charity_names_and_ids() do
     query =
       from(c in Charity,
         order_by: :name,

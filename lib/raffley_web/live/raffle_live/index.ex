@@ -1,9 +1,12 @@
 defmodule RaffleyWeb.RaffleLive.Index do
   use RaffleyWeb, :live_view
   alias Raffley.Raffles
+  alias Raffley.Charities
   import RaffleyWeb.CustomComponents
 
   def mount(_params, _session, socket) do
+    socket =
+      assign(socket, :charity_options, Charities.charity_names_and_slugs())
     {:ok, socket}
   end
 
@@ -33,7 +36,7 @@ defmodule RaffleyWeb.RaffleLive.Index do
         </:details>
       </.banner>
 
-      <.filter_form form={@form} />
+      <.filter_form form={@form} charity_options={@charity_options} />
 
       <div class="raffles" id="raffles" phx-update="stream">
         <div id="empty" class="no-results only:block hidden">
@@ -64,12 +67,20 @@ defmodule RaffleyWeb.RaffleLive.Index do
 
           <.input
           type="select"
+          field={@form[:charity]}
+          prompt="Charity"
+          options={assigns.charity_options}
+          />
+
+          <.input
+          type="select"
           field={@form[:sort_by]}
           prompt="Sort By"
           options={[
             Prize: "prize",
             "Price: High to Low": "ticket_price_desc",
             "Price: Low to High": "ticket_price_asc",
+            "Charity": "charity",
             ]}
           />
 
@@ -85,7 +96,7 @@ defmodule RaffleyWeb.RaffleLive.Index do
   def handle_event("filter", params, socket) do
     params =
       params
-      |> Map.take(~w(q status sort_by))
+      |> Map.take(~w(q status sort_by charity))
       |> Map.reject(fn {_, v} -> v == "" end)
 
     socket = push_patch(socket, to: ~p"/raffles?#{params}")
