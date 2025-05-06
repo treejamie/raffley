@@ -54,6 +54,7 @@ defmodule RaffleyWeb.Router do
     pipe_through :api
 
     get "/raffles", RaffleController, :index
+    post "/raffles", RaffleController, :create
     get "/raffles/:id", RaffleController, :show
   end
 
