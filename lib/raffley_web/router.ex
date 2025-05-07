@@ -23,7 +23,7 @@ defmodule RaffleyWeb.Router do
   def spy(conn, _opts) do
     greeting = ~w(Hi Howdy Hello Alreet) |> Enum.random()
     conn = assign(conn, :greeting, greeting)
-    # IO.inspect(conn)
+    #IO.inspect(conn)
     conn
   end
 
@@ -39,6 +39,13 @@ defmodule RaffleyWeb.Router do
     live "/estimator", EstimatorLive
     live "/raffles", RaffleLive.Index
     live "/raffles/:id", RaffleyLive.Show
+  end
+
+  scope "/", RaffleyWeb do
+    pipe_through [
+      :browser,
+      :require_authenticated_user
+    ]
 
     live "/admin/raffles", AdminRaffleLive.Index
     live "/admin/raffles/new", AdminRaffleLive.Form, :new
@@ -51,6 +58,7 @@ defmodule RaffleyWeb.Router do
     live "/charities/:id", CharityLive.Show, :show
     live "/charities/:id/show/edit", CharityLive.Show, :edit
   end
+
 
   # Other scopes may use custom stacks.
   scope "/api", RaffleyWeb.Api do
