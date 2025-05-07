@@ -4,6 +4,7 @@ defmodule RaffleyWeb.RaffleLive.Index do
   alias Raffley.Charities
   import RaffleyWeb.CustomComponents
 
+
   def mount(_params, _session, socket) do
     socket =
       assign(socket, :charity_options, Charities.charity_names_and_slugs())
