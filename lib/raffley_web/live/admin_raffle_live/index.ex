@@ -3,9 +3,6 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
   alias Raffley.Admin
   import RaffleyWeb.CustomComponents
 
-  on_mount {RaffleyWeb.UserAuth, :ensure_authenticated}
-
-
   def mount(_params, _session, socket) do
     socket =
       socket
@@ -75,7 +72,6 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
     """
   end
 
-
   def handle_event("delete", %{"id" => id}, socket) do
     raffle = Admin.get_raffle!(id)
     {:ok, _raffle} = Admin.delete_raffle(raffle)
@@ -84,11 +80,8 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
     {:noreply, socket}
   end
 
-
-
   def delete_and_hide(dom_id, raffle) do
     JS.push("delete", value: %{id: raffle.id})
     |> JS.hide(to: "##{dom_id}", transition: "fade-out")
   end
-
 end

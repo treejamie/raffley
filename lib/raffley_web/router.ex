@@ -1,74 +1,72 @@
 defmodule RaffleyWeb.Router do
-
   use RaffleyWeb, :router
 
   import RaffleyWeb.UserAuth
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_live_flash
-    plug :put_root_layout, html: {RaffleyWeb.Layouts, :root}
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
-    plug :fetch_current_user
-    plug :spy
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_live_flash)
+    plug(:put_root_layout, html: {RaffleyWeb.Layouts, :root})
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+    plug(:fetch_current_user)
+    plug(:spy)
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
-
 
   def spy(conn, _opts) do
     greeting = ~w(Hi Howdy Hello Alreet) |> Enum.random()
     conn = assign(conn, :greeting, greeting)
-    #IO.inspect(conn)
+    # IO.inspect(conn)
     conn
   end
 
   scope "/", RaffleyWeb do
-    pipe_through :browser
+    pipe_through(:browser)
 
-    #get "/", PageController, :home
-    get "/rules", RuleController, :index
-    get "/rules/:id", RuleController, :show
+    # get "/", PageController, :home
+    get("/rules", RuleController, :index)
+    get("/rules/:id", RuleController, :show)
 
-
-    live "/", RaffleLive.Index
-    live "/estimator", EstimatorLive
-    live "/raffles", RaffleLive.Index
-    live "/raffles/:id", RaffleyLive.Show
+    live("/", RaffleLive.Index)
+    live("/estimator", EstimatorLive)
+    live("/raffles", RaffleLive.Index)
+    live("/raffles/:id", RaffleyLive.Show)
   end
 
   scope "/", RaffleyWeb do
-    pipe_through [
+    pipe_through([
       :browser,
       :require_authenticated_user
-    ]
+    ])
 
-    live "/admin/raffles", AdminRaffleLive.Index
-    live "/admin/raffles/new", AdminRaffleLive.Form, :new
-    live "/admin/raffles/:id/edit", AdminRaffleLive.Form, :edit
+    live_session :admin,
+      on_mount: [{RaffleyWeb.UserAuth, :ensure_authenticated}] do
+      live("/admin/raffles", AdminRaffleLive.Index)
+      live("/admin/raffles/new", AdminRaffleLive.Form, :new)
+      live("/admin/raffles/:id/edit", AdminRaffleLive.Form, :edit)
 
-    live "/charities", CharityLive.Index, :index
-    live "/charities/new", CharityLive.Index, :new
-    live "/charities/:id/edit", CharityLive.Index, :edit
+      live("/charities", CharityLive.Index, :index)
+      live("/charities/new", CharityLive.Index, :new)
+      live("/charities/:id/edit", CharityLive.Index, :edit)
 
-    live "/charities/:id", CharityLive.Show, :show
-    live "/charities/:id/show/edit", CharityLive.Show, :edit
+      live("/charities/:id", CharityLive.Show, :show)
+      live("/charities/:id/show/edit", CharityLive.Show, :edit)
+    end
   end
-
 
   # Other scopes may use custom stacks.
   scope "/api", RaffleyWeb.Api do
-    pipe_through :api
+    pipe_through(:api)
 
-    get "/raffles", RaffleController, :index
-    post "/raffles", RaffleController, :create
-    get "/raffles/:id", RaffleController, :show
+    get("/raffles", RaffleController, :index)
+    post("/raffles", RaffleController, :create)
+    get("/raffles/:id", RaffleController, :show)
   end
-
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:raffley, :dev_routes) do
@@ -80,48 +78,48 @@ defmodule RaffleyWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through :browser
+      pipe_through(:browser)
 
-      live_dashboard "/dashboard", metrics: RaffleyWeb.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      live_dashboard("/dashboard", metrics: RaffleyWeb.Telemetry)
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 
   ## Authentication routes
 
   scope "/", RaffleyWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
+    pipe_through([:browser, :redirect_if_user_is_authenticated])
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{RaffleyWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      live "/users/register", UserRegistrationLive, :new
-      live "/users/log_in", UserLoginLive, :new
-      live "/users/reset_password", UserForgotPasswordLive, :new
-      live "/users/reset_password/:token", UserResetPasswordLive, :edit
+      live("/users/register", UserRegistrationLive, :new)
+      live("/users/log_in", UserLoginLive, :new)
+      live("/users/reset_password", UserForgotPasswordLive, :new)
+      live("/users/reset_password/:token", UserResetPasswordLive, :edit)
     end
 
-    post "/users/log_in", UserSessionController, :create
+    post("/users/log_in", UserSessionController, :create)
   end
 
   scope "/", RaffleyWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through([:browser, :require_authenticated_user])
 
     live_session :require_authenticated_user,
       on_mount: [{RaffleyWeb.UserAuth, :ensure_authenticated}] do
-      live "/users/settings", UserSettingsLive, :edit
-      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      live("/users/settings", UserSettingsLive, :edit)
+      live("/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email)
     end
   end
 
   scope "/", RaffleyWeb do
-    pipe_through [:browser]
+    pipe_through([:browser])
 
-    delete "/users/log_out", UserSessionController, :delete
+    delete("/users/log_out", UserSessionController, :delete)
 
     live_session :current_user,
       on_mount: [{RaffleyWeb.UserAuth, :mount_current_user}] do
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
+      live("/users/confirm/:token", UserConfirmationLive, :edit)
+      live("/users/confirm", UserConfirmationInstructionsLive, :new)
     end
   end
 end
