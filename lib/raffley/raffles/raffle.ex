@@ -10,6 +10,7 @@ defmodule Raffley.Raffles.Raffle do
     field(:image_path, :string, default: "/images/placeholder.jpg")
 
     belongs_to(:charity, Raffley.Charities.Charity)
+    has_many(:tickets, Raffle.Tickets.Ticket)
 
     # remember ecto creates, two "under the hood fields".
     # sometimes you'll need to open the hood in your own work

@@ -2,12 +2,16 @@ defmodule RaffleyWeb.RaffleyLive.Show do
   use RaffleyWeb, :live_view
   alias Raffley.Raffles
 
+  on_mount({RaffleyWeb.UserAuth, :mount_current_user})
+
   def mount(_params, _session, socket) do
+    socket =
+      assign(socket, :form, to_form(%{}))
+
     {:ok, socket}
   end
 
   def handle_params(%{"id" => id}, _uri, socket) do
-
     # this code was in mount, but it was moved into
     # here to demonstrate how this works.
     raffle = Raffles.get_raffle!(id)
@@ -16,8 +20,8 @@ defmodule RaffleyWeb.RaffleyLive.Show do
       socket
       |> assign(:raffle, raffle)
       |> assign(:page_title, raffle.prize)
-      |> assign_async(:featured_raffles, fn  ->
-         {:ok, %{featured_raffles: Raffles.featured_raffles(raffle)}}
+      |> assign_async(:featured_raffles, fn ->
+        {:ok, %{featured_raffles: Raffles.featured_raffles(raffle)}}
       end)
 
     {:noreply, socket}
@@ -47,10 +51,25 @@ defmodule RaffleyWeb.RaffleyLive.Show do
       </div>
       <div class="activity">
         <div class="left">
-        </div>
-          <div class="right">
-          <.featured_raffles raffles={@featured_raffles} />
+          <div :if={@raffle.status == :open}>
+            <%= if @current_user do %>
+            <.form for={@form} id="ticket-form">
+              <.input field={@form[:comment]} placeholder="Comment.." autofocus />
+              <.button>
+                Get a ticket
+              </.button>
+            </.form>
+            <% else %>
+              <.link href={~p"/users/log_in"} class="button">
+                Log in to get a ticket.
+              </.link>
+            <% end %>
           </div>
+        </div>
+
+        <div class="right">
+          <.featured_raffles raffles={@featured_raffles} />
+        </div>
       </div>
     </div>
     """
