@@ -49,8 +49,11 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
         <:col :let={{_dom_id, raffle}} label="Status">
           <.badge status={raffle.status} />
         </:col>
-        <:col :let={{_dom_id, raffle}} label="Ticket Proce">
+        <:col :let={{_dom_id, raffle}} label="Ticket Price">
             {raffle.ticket_price}
+        </:col>
+        <:col :let={{_dom_id, raffle}} label="Winning Ticket #">
+            {raffle.winning_ticket_id}
         </:col>
 
         <:action :let={{_dom_id, raffle}}>
@@ -67,9 +70,31 @@ defmodule RaffleyWeb.AdminRaffleLive.Index do
           </.link>
         </:action>
 
+        <:action :let={{_dom_id, raffle}}>
+          <.link phx-click="draw-winner" phx-value-id={raffle.id}>
+           Draw Winner
+          </.link>
+        </:action>
+
       </.table>
     </div>
     """
+  end
+
+  def handle_event("draw-winner", %{"id" => id}, socket) do
+    raffle = Admin.get_raffle!(id)
+
+    case Admin.draw_winner(raffle) do
+      {:ok, raffle} ->
+        socket =
+          socket
+          |> put_flash(:info, "winning ticket drawn!")
+          |> stream_insert(:raffles, raffle)
+
+        {:noreply, socket}
+      {:error, error} ->
+        {:noreply, put_flash(socket, :error, error)}
+    end
   end
 
   def handle_event("delete", %{"id" => id}, socket) do
