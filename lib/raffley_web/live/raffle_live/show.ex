@@ -3,6 +3,7 @@ defmodule RaffleyWeb.RaffleyLive.Show do
   alias Raffley.Raffles
   alias Raffley.Tickets
   alias Raffley.Tickets.Ticket
+  alias RaffleyWeb.Presence
 
   import RaffleyWeb.CustomComponents
 
@@ -17,9 +18,25 @@ defmodule RaffleyWeb.RaffleyLive.Show do
   end
 
   def handle_params(%{"id" => id}, _uri, socket) do
+    %{current_user: current_user} = socket.assigns
+
     if connected?(socket) do
+      # pubsub
       Raffles.subscribe(id)
+
+      if current_user do
+        {:ok, _} =
+          Presence.track(self(), topic(id), current_user.username, %{
+            online_at: System.system_time(:second)
+          })
+      end
     end
+
+    presence =
+     Presence.list(topic(id))
+     |> Enum.map(fn {username, %{metas: metas}} ->
+      %{id: username, metas: metas}
+    end)
 
     raffle = Raffles.get_raffle!(id)
 
@@ -30,14 +47,17 @@ defmodule RaffleyWeb.RaffleyLive.Show do
       |> assign(:raffle, raffle)
       |> stream(:tickets, tickets)
       |> assign(:page_title, raffle.prize)
+      |> stream(:presences, presence)
       |> assign(:ticket_count, Enum.count(tickets))
-      |> assign(:ticket_sum, Enum.sum_by(tickets, fn t-> t.price end))
+      |> assign(:ticket_sum, Enum.sum_by(tickets, fn t -> t.price end))
       |> assign_async(:featured_raffles, fn ->
         {:ok, %{featured_raffles: Raffles.featured_raffles(raffle)}}
       end)
 
     {:noreply, socket}
   end
+
+  defp topic(id), do: "raffle_watchers:#{id}"
 
   def render(assigns) do
     ~H"""
@@ -102,9 +122,24 @@ defmodule RaffleyWeb.RaffleyLive.Show do
 
         <div class="right">
           <.featured_raffles raffles={@featured_raffles} />
+          <.raffle_watchers :if={@current_user} presences={@streams.presences}/>
         </div>
       </div>
     </div>
+    """
+  end
+
+  def raffle_watchers(assigns) do
+    ~H"""
+    <section>
+      <h4> Who's Here?</h4>
+      <ul id="raffle-watchers" phx-update="stream" class="presences">
+        <li :for={{dom_id, %{id: username, metas: metas}} <- @presences} id={dom_id}>
+          <.icon name="hero-user-circle-solid" class="w-5 h-5" />
+          {username} ({length(metas)})
+        </li>
+      </ul>
+    </section>
     """
   end
 
@@ -143,8 +178,9 @@ defmodule RaffleyWeb.RaffleyLive.Show do
     """
   end
 
-  attr :id, :string,  required: true
-  attr :ticket, Ticket, required: true
+  attr(:id, :string, required: true)
+  attr(:ticket, Ticket, required: true)
+
   def ticket(assigns) do
     ~H"""
     <div class="ticket" id={@id}>
@@ -176,37 +212,35 @@ defmodule RaffleyWeb.RaffleyLive.Show do
   end
 
   def handle_event("save", %{"ticket" => ticket_params}, socket) do
-
     %{raffle: raffle, current_user: user} = socket.assigns
 
     case Tickets.create_ticket(raffle, user, ticket_params) do
       {:ok, _ticket} ->
         changeset = Tickets.change_ticket(%Ticket{})
+
         socket =
           socket
           |> assign(:form, to_form(changeset))
-
 
         {:noreply, socket}
 
       {:error, changeset} ->
         socket = assign(socket, :form, to_form(changeset))
         {:noreply, socket}
-      end
+    end
   end
 
-    def handle_info({:ticket_created, ticket}, socket) do
-      socket =
-        socket
-          |> stream_insert(:tickets, ticket, at: 0)
-          |> update(:ticket_count, &(&1 + 1))
-          |> update(:ticket_sum, &(&1 + ticket.price))
+  def handle_info({:ticket_created, ticket}, socket) do
+    socket =
+      socket
+      |> stream_insert(:tickets, ticket, at: 0)
+      |> update(:ticket_count, &(&1 + 1))
+      |> update(:ticket_sum, &(&1 + ticket.price))
 
-      {:noreply, socket}
-    end
+    {:noreply, socket}
+  end
 
-    def handle_info({:raffle_updated, raffle}, socket) do
-      {:noreply, assign(socket, :raffle, raffle) }
-    end
-
+  def handle_info({:raffle_updated, raffle}, socket) do
+    {:noreply, assign(socket, :raffle, raffle)}
+  end
 end
